@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Parks on Street View</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 2px solid black;
+            background-color: #f0f0f0;
+        }
+        .header img {
+            height: 30px;
+            cursor: pointer;
+        }
+        .header img.youtube-icon {
+            width: auto;
+            max-height: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            flex-grow: 1;
+            text-align: center;
+        }
+        .iframe-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="https://raw.githubusercontent.com/FreddieThePebble/StreetView-CarParks/main/Refresh.png" alt="Refresh" onclick="redirectToHomepage()">
+        <h1>Car Parks on Street View</h1>
+        <img src="https://raw.githubusercontent.com/FreddieThePebble/StreetView-CarParks/main/YouTube.png" alt="YouTube" class="youtube-icon" onclick="openYouTube()">
+    </div>
+    <div class="iframe-container">
+        <iframe id="mapFrame" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+</div>
+
+<script>
+    // Array of iframe sources
+    const iframeSources = [
+        "https://www.google.com/maps/embed?pb=!4v1723903356318!6m8!1m7!1sy6YlvWA55Stpw6oW7H2DwQ!2m2!1d52.98558178792843!2d-1.880878531194213!3f80.65043328315963!4f-20.560552307249935!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723903404834!6m8!1m7!1sqKG4eX_0W9GUae1lbKdDGw!2m2!1d52.9888603877738!2d-1.882271124840058!3f106.64733717590502!4f-2.391204083099268!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723903445693!6m8!1m7!1szTCmv7iucsVO_NEh3MiK4w!2m2!1d52.9868691624715!2d-1.876834617262796!3f269.74071832310193!4f-0.6353525717021!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723903489438!6m8!1m7!1si7JOYrtvotgyN2hQ4YRtvg!2m2!1d51.40571966866736!2d-0.5090989458664253!3f52.934332353031124!4f-7.259760953611888!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723903589562!6m8!1m7!1stRJ_QgMRujhKDYjbtdfGkg!2m2!1d51.34970739121034!2d-0.3139140131386649!3f198.49843853594564!4f-5.588258135005361!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723903622569!6m8!1m7!1sc7Pu-hsl_jPBLqTfMIUFeA!2m2!1d50.94682084324898!2d-1.551662838370357!3f315.5776948521302!4f-0.21211287362356757!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723903657716!6m8!1m7!1szTToS2vYQ_D3XsGRSxPn0g!2m2!1d53.19203027636527!2d0.346212871996649!3f197.7938313567989!4f-1.5767095417411667!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723903701038!6m8!1m7!1sqtte_cJFABlTw3y13Ttkaw!2m2!1d51.52422300455687!2d0.4474409280503523!3f153.75074561035404!4f-8.330172495785405!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904148037!6m8!1m7!1sm3yxrJ2aswmSdNr0rk1Svw!2m2!1d51.56309537599422!2d0.5023611031451248!3f328.4575741600893!4f-3.726242185545516!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904207948!6m8!1m7!1s3vlmxYPjdIzwdJAi8EKL9Q!2m2!1d51.56064465868419!2d0.6834981034529742!3f142.3026008243861!4f0.5288753038425966!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904275482!6m8!1m7!1sFnaW40ikbGUV4Xo6pXM7Hw!2m2!1d51.56720655011407!2d0.399066898401602!3f55.88082510461803!4f-8.794070520411822!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904321235!6m8!1m7!1s2ASTnlQrGOtsB-betRWMvQ!2m2!1d51.58394832177144!2d0.4640711803660091!3f310.246991878729!4f-7.81513697603296!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904361103!6m8!1m7!1siJXOKhTgLvw5Ehh1upr7DQ!2m2!1d51.59064991260463!2d0.474565869801244!3f71.50000446173972!4f-0.5482615667162634!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904400366!6m8!1m7!1sflMUfB-78N2bniYlIFn7Dg!2m2!1d51.47916134693112!2d0.2601911084178725!3f345.59896257111757!4f1.5093887175461589!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904443965!6m8!1m7!1sPR-OlTCCQQ4dr4bSFMSSbA!2m2!1d51.48753630939137!2d0.2753565208385443!3f19.562182105195916!4f-1.2552815663850652!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904465933!6m8!1m7!1sLkjoxJ_4UH0QTcFIJkd2gg!2m2!1d51.48603349703007!2d0.2858243226514167!3f311.6166776762451!4f-3.2309327887870865!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723904499965!6m8!1m7!1sN0Q4W25YCB4njbJwOuOxyQ!2m2!1d51.55847580811452!2d0.2525237410251908!3f91.99262457195601!4f-4.676064988479908!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723905098795!6m8!1m7!1shud2R-Nfqq3q4rV0No0EDQ!2m2!1d51.48023254165158!2d0.2842424547558234!3f41.881996497181206!4f0.7648779103758443!5f0.7820865974627469",
+        "https://www.google.com/maps/embed?pb=!4v1723905252224!6m8!1m7!1sxTIXn1VKoi6r4I4FjiMI7A!2m2!1d51.5579770720517!2d0.4535232233996512!3f138.30022035095288!4f-1.249712488335092!5f0.7820865974627469"
+    ];
+
+    // Function to get a random iframe source
+    function getRandomIframeSource() {
+        const randomIndex = Math.floor(Math.random() * iframeSources.length);
+        return iframeSources[randomIndex];
+    }
+
+    // Set the src of the iframe when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        const iframe = document.getElementById('mapFrame');
+        iframe.src = getRandomIframeSource();
+    });
+
+    // Function to redirect to the homepage
+    function redirectToHomepage() {
+        window.location.href = 'https://freddiethepebble.github.io/StreetView-CarParks/';
+    }
+
+    // Function to open YouTube video
+    function openYouTube() {
+        window.open('https://www.youtube.com/watch?v=pqPWVOgoYXc', '_blank');
+    }
+</script>
+
+</body>
+</html>
